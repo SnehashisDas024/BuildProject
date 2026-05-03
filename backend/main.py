@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
@@ -69,6 +70,10 @@ async def perform_scan(request: ScanRequest):
         vulnerabilities=vulns,
         gitignore=scan_results.get('gitignore', '')
     )
+
+# Serve the frontend static files at the root
+frontend_path = os.path.join(os.path.dirname(__file__), "../frontend")
+app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
 
 if __name__ == "__main__":
     import uvicorn
