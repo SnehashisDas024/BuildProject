@@ -123,6 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="text-slate-300 font-mono text-xs break-all bg-slate-950 p-2 rounded border border-slate-800">
                         <span class="text-slate-500">File:</span> ${s.file}
                     </div>
+                    <div class="mt-2 text-xs font-mono text-slate-400 bg-slate-800/50 p-2 rounded border border-slate-700">
+                        <span class="text-blue-400 mr-1">💡 Hint:</span> ${s.remediation}
+                    </div>
                 </div>
             `).join('');
         }
@@ -139,12 +142,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 let severityColor = 'text-yellow-400';
                 if (v.severity === 'HIGH' || (parseFloat(v.severity) >= 7.0)) severityColor = 'text-red-400';
                 
+                let fixBadge = v.fixed_version !== 'No patch available' 
+                    ? `<span class="text-xs bg-emerald-900/50 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800 font-mono ml-2">Fix: Upgrade to v${v.fixed_version}</span>`
+                    : `<span class="text-xs bg-slate-800/50 text-slate-500 px-2 py-0.5 rounded border border-slate-700 font-mono ml-2">No patch available</span>`;
+                
                 return `
                 <div class="p-4 bg-slate-900/80 rounded-lg border border-orange-900/30 flex flex-col gap-2">
                     <div class="flex items-start justify-between">
                         <div>
                             <span class="text-orange-300 font-mono text-sm font-semibold">${v.package}</span>
                             <span class="text-slate-500 text-xs ml-2">v${v.version}</span>
+                            ${fixBadge}
                         </div>
                         <span class="text-xs bg-slate-800 px-2 py-0.5 rounded border border-slate-700 font-mono ${severityColor}">${v.id}</span>
                     </div>

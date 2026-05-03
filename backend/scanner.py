@@ -87,10 +87,17 @@ def scan_repository(owner: str, repo: str):
                     for name, pattern in SECRET_PATTERNS.items():
                         matches = re.findall(pattern, content)
                         if matches:
+                            remediation = "Revoke this token immediately in the provider's dashboard. Remove from git history and add to .gitignore."
+                            if "AWS" in name:
+                                remediation = "CRITICAL: Log into AWS Console and Deactivate this Access Key immediately. Do not just delete the file. Use 'BFG Repo-Cleaner' or 'git filter-repo' to wipe it from git history."
+                            elif "RSA" in name or "Private" in name:
+                                remediation = "CRITICAL: Consider this key compromised. Generate a new keypair and rotate it on your servers. Wipe this file from git history."
+                            
                             secrets_found.append({
                                 "file": path,
                                 "type": name,
-                                "matches": len(matches)
+                                "matches": len(matches),
+                                "remediation": remediation
                             })
                 except Exception:
                     pass

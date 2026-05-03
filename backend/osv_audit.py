@@ -66,13 +66,27 @@ def check_osv(package: str, version: str, ecosystem: str):
         if resp.status_code == 200:
             data = resp.json()
             if 'vulns' in data:
-                return [{
-                    "id": v['id'],
-                    "package": package,
-                    "version": version,
-                    "summary": v.get('summary', 'Unknown vulnerability'),
-                    "severity": get_severity(v)
-                } for v in data['vulns']]
+                results = []
+                for v in data['vulns']:
+                    fixed_version = "No patch available"
+                    try:
+                        events = v['affected'][0]['ranges'][0]['events']
+                        for event in events:
+                            if 'fixed' in event:
+                                fixed_version = event['fixed']
+                                break
+                    except (KeyError, IndexError, TypeError):
+                        pass
+                    
+                    results.append({
+                        "id": v['id'],
+                        "package": package,
+                        "version": version,
+                        "summary": v.get('summary', 'Unknown vulnerability'),
+                        "severity": get_severity(v),
+                        "fixed_version": fixed_version
+                    })
+                return results
     except Exception:
         pass
     return []
